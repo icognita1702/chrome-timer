@@ -2,24 +2,26 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Timer Digital</title>
+  <meta name="viewport" content="width=320, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="Timer Digital Pomodoro - Gerenciamento de tempo vintage">
+  <title>Timer Digital Pomodoro</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
   <div class="container">
     <!-- Abas de Modo -->
-    <div class="mode-tabs">
-      <button class="mode-tab active" data-mode="clock">RELÓGIO</button>
-      <button class="mode-tab" data-mode="stopwatch">CRONÔMETRO</button>
-      <button class="mode-tab" data-mode="countdown">TIMER</button>
-    </div>
+    <nav class="mode-tabs" role="tablist" aria-label="Modos do timer">
+      <button class="mode-tab active" data-mode="clock" role="tab" aria-selected="true" aria-controls="clock-panel">RELÓGIO</button>
+      <button class="mode-tab" data-mode="stopwatch" role="tab" aria-selected="false" aria-controls="stopwatch-panel">CRONÔMETRO</button>
+      <button class="mode-tab" data-mode="countdown" role="tab" aria-selected="false" aria-controls="countdown-panel">TIMER</button>
+    </nav>
 
     <!-- Relógio Vintage -->
-    <div class="clock-container">
-      <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
-        <!-- Sombra externa -->
+    <div class="clock-container" role="img" aria-label="Display do relógio">
+      <svg class="clock-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+        <!-- Definições de filtros e gradientes -->
         <defs>
+          <!-- Sombra externa -->
           <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur in="SourceAlpha" stdDeviation="8"/>
             <feOffset dx="0" dy="4" result="offsetblur"/>
@@ -31,73 +33,85 @@
               <feMergeNode in="SourceGraphic"/>
             </feMerge>
           </filter>
+
+          <!-- Gradiente radial para o fundo do relógio -->
           <radialGradient id="clockFace" cx="50%" cy="50%" r="50%">
             <stop offset="0%" style="stop-color:#f5f1e8;stop-opacity:1" />
             <stop offset="70%" style="stop-color:#e8dfc5;stop-opacity:1" />
             <stop offset="100%" style="stop-color:#d4c5a0;stop-opacity:1" />
           </radialGradient>
+
+          <!-- Gradiente para efeito de profundidade -->
+          <radialGradient id="depth" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.3" />
+            <stop offset="100%" style="stop-color:#000000;stop-opacity:0.2" />
+          </radialGradient>
         </defs>
 
-        <!-- Moldura externa (madeira escura) -->
-        <circle cx="200" cy="200" r="195" fill="#3d2817" filter="url(#shadow)"/>
-        <circle cx="200" cy="200" r="185" fill="#8b4513"/>
-        <circle cx="200" cy="200" r="175" fill="#654321"/>
-        
+        <!-- Círculo externo (moldura) -->
+        <circle class="clock-border" cx="200" cy="200" r="190" filter="url(#shadow)"/>
+
         <!-- Face do relógio -->
-        <circle cx="200" cy="200" r="165" fill="url(#clockFace)" stroke="#8b4513" stroke-width="3"/>
+        <circle class="clock-face" cx="200" cy="200" r="180" fill="url(#clockFace)"/>
 
-        <!-- Marcações de hora -->
-        <g id="hour-markers">
-          <!-- 12 -->
-          <rect x="197" y="50" width="6" height="25" fill="#2a1810" rx="3"/>
-          <!-- 3 -->
-          <rect x="325" y="197" width="25" height="6" fill="#2a1810" rx="3"/>
-          <!-- 6 -->
-          <rect x="197" y="325" width="6" height="25" fill="#2a1810" rx="3"/>
-          <!-- 9 -->
-          <rect x="50" y="197" width="25" height="6" fill="#2a1810" rx="3"/>
+        <!-- Efeito de profundidade -->
+        <circle cx="200" cy="200" r="180" fill="url(#depth)" opacity="0.4"/>
+
+        <!-- Marcadores de horas -->
+        <g id="hour-markers" stroke="#8b4513" stroke-width="3">
+          <!-- 12 marcadores principais -->
+          <line x1="200" y1="30" x2="200" y2="50" stroke-width="4"/>
+          <line x1="200" y1="350" x2="200" y2="370" stroke-width="4"/>
+          <line x1="30" y1="200" x2="50" y2="200" stroke-width="4"/>
+          <line x1="350" y1="200" x2="370" y2="200" stroke-width="4"/>
+          
+          <!-- Marcadores secundários -->
+          <line x1="286" y1="54" x2="276" y2="69"/>
+          <line x1="346" y1="114" x2="331" y2="124"/>
+          <line x1="346" y1="286" x2="331" y2="276"/>
+          <line x1="286" y1="346" x2="276" y2="331"/>
+          <line x1="114" y1="346" x2="124" y2="331"/>
+          <line x1="54" y1="286" x2="69" y2="276"/>
+          <line x1="54" y1="114" x2="69" y2="124"/>
+          <line x1="114" y1="54" x2="124" y2="69"/>
         </g>
 
-        <!-- Números -->
-        <text x="200" y="70" font-size="30" font-weight="bold" fill="#2a1810" text-anchor="middle" dominant-baseline="middle">12</text>
-        <text x="330" y="210" font-size="30" font-weight="bold" fill="#2a1810" text-anchor="middle" dominant-baseline="middle">3</text>
-        <text x="200" y="350" font-size="30" font-weight="bold" fill="#2a1810" text-anchor="middle" dominant-baseline="middle">6</text>
-        <text x="70" y="210" font-size="30" font-weight="bold" fill="#2a1810" text-anchor="middle" dominant-baseline="middle">9</text>
+        <!-- Display de tempo digital -->
+        <text class="time-display" x="200" y="200" id="time-text">00:00</text>
 
-        <!-- Ponteiros -->
-        <g id="clock-hands">
-          <!-- Ponteiro das horas -->
-          <line id="hour-hand" x1="200" y1="200" x2="200" y2="120" stroke="#2a1810" stroke-width="8" stroke-linecap="round"/>
-          <!-- Ponteiro dos minutos -->
-          <line id="minute-hand" x1="200" y1="200" x2="200" y2="90" stroke="#654321" stroke-width="6" stroke-linecap="round"/>
-          <!-- Ponteiro dos segundos -->
-          <line id="second-hand" x1="200" y1="200" x2="200" y2="70" stroke="#d4af37" stroke-width="2" stroke-linecap="round"/>
-        </g>
-
-        <!-- Centro do relógio -->
-        <circle cx="200" cy="200" r="12" fill="#8b4513" stroke="#d4af37" stroke-width="2"/>
-        <circle cx="200" cy="200" r="6" fill="#d4af37"/>
-
-        <!-- Display digital no centro -->
-        <text id="timer-display" x="200" y="270" font-size="24" font-weight="bold" fill="#2a1810" text-anchor="middle" dominant-baseline="middle">00:00:00</text>
+        <!-- Label da sessão -->
+        <text class="session-label" x="200" y="260" id="session-text">Pronto</text>
       </svg>
     </div>
 
     <!-- Controles -->
-    <div class="controls">
-      <button class="control-btn" id="startBtn">INICIAR</button>
-      <button class="control-btn" id="resetBtn">RESETAR</button>
+    <div class="controls" role="group" aria-label="Controles do timer">
+      <button class="control-btn" id="start-btn" aria-label="Iniciar timer">Iniciar</button>
+      <button class="control-btn" id="pause-btn" aria-label="Pausar timer" style="display: none;">Pausar</button>
+      <button class="control-btn" id="reset-btn" aria-label="Resetar timer">Resetar</button>
     </div>
 
-    <!-- Configuração de Timer (aparece apenas no modo countdown) -->
-    <div class="timer-config" id="timerConfig">
-      <label for="timerMinutes">Minutos:</label>
-      <input type="number" id="timerMinutes" min="0" max="59" value="25">
-      <label for="timerSeconds">Segundos:</label>
-      <input type="number" id="timerSeconds" min="0" max="59" value="0">
+    <!-- Configurações (ocultas por padrão) -->
+    <div class="settings hidden" id="settings" role="region" aria-label="Configurações do timer">
+      <div class="setting-group">
+        <label for="work-duration">Duração do Foco (min):</label>
+        <input type="number" id="work-duration" min="1" max="60" value="25" aria-describedby="work-duration-desc">
+        <span id="work-duration-desc" class="sr-only">Entre 1 e 60 minutos</span>
+      </div>
+      <div class="setting-group">
+        <label for="break-duration">Duração do Intervalo (min):</label>
+        <input type="number" id="break-duration" min="1" max="30" value="5" aria-describedby="break-duration-desc">
+        <span id="break-duration-desc" class="sr-only">Entre 1 e 30 minutos</span>
+      </div>
+      <div class="setting-group">
+        <label for="long-break-duration">Duração do Intervalo Longo (min):</label>
+        <input type="number" id="long-break-duration" min="5" max="60" value="15" aria-describedby="long-break-duration-desc">
+        <span id="long-break-duration-desc" class="sr-only">Entre 5 e 60 minutos</span>
+      </div>
     </div>
   </div>
 
+  <!-- Script principal -->
   <script src="popup.js"></script>
 </body>
 </html>
