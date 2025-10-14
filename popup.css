@@ -5,10 +5,10 @@
 }
 
 body {
-  width: 320px;
-  height: 420px;
-  background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
-  font-family: 'Courier New', monospace;
+  width: 420px;
+  height: 520px;
+  background: linear-gradient(135deg, #2a1810 0%, #1a0f08 100%);
+  font-family: 'Georgia', serif;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -18,7 +18,7 @@ body {
 .container {
   width: 100%;
   height: 100%;
-  padding: 15px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -28,186 +28,218 @@ body {
 /* Abas de Modo */
 .mode-tabs {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   margin-bottom: 15px;
   width: 100%;
+  justify-content: center;
 }
 
 .tab {
   flex: 1;
-  padding: 8px 4px;
-  font-size: 11px;
-  font-weight: bold;
-  color: #666;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
+  padding: 10px 15px;
+  background: linear-gradient(145deg, #3d2817, #2c1810);
+  color: #d4c4a0;
+  border: 2px solid #654321;
+  border-radius: 8px;
   cursor: pointer;
+  font-family: 'Georgia', serif;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 1px;
   transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
 }
 
 .tab:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #999;
+  background: linear-gradient(145deg, #4d3827, #3d2817);
+  border-color: #8b7355;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.6);
 }
 
 .tab.active {
-  background: linear-gradient(135deg, #00ff88 0%, #00aa55 100%);
-  color: #0a0e27;
-  border-color: #00ff88;
-  box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+  background: linear-gradient(145deg, #8b7355, #654321);
+  color: #f5f1e8;
+  border-color: #a0825d;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
-/* Display Digital */
-.timer-display {
-  font-size: 48px;
-  font-weight: bold;
-  color: #00ff88;
-  text-shadow: 
-    0 0 10px #00ff88,
-    0 0 20px #00ff88,
-    0 0 30px #00ff88,
-    0 0 40px #00aa55;
-  letter-spacing: 6px;
-  margin: 20px 0;
-  background: rgba(0, 255, 136, 0.05);
-  padding: 20px 15px;
-  border-radius: 12px;
-  border: 2px solid rgba(0, 255, 136, 0.2);
-  min-height: 88px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Relógio Analógico Vintage */
+.analog-clock-container {
   width: 100%;
+  max-width: 350px;
+  height: 350px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px auto;
 }
 
-/* Inputs de Tempo */
+#analogClock {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.7));
+}
+
+.clock-number {
+  font-family: 'Georgia', serif;
+  font-size: 28px;
+  font-weight: bold;
+  fill: #654321;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Animações dos ponteiros */
+#hourHand {
+  transform-origin: 200px 200px;
+  transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+#minuteHand {
+  transform-origin: 200px 200px;
+  transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+#secondHand {
+  transform-origin: 200px 200px;
+  transition: transform 0.05s linear;
+}
+
+/* Display Digital (para modos timer/stopwatch) */
+.timer-display {
+  font-size: 56px;
+  font-family: 'Georgia', serif;
+  color: #f5f1e8;
+  background: linear-gradient(145deg, #3d2817, #2c1810);
+  padding: 25px 35px;
+  border-radius: 15px;
+  text-align: center;
+  letter-spacing: 4px;
+  box-shadow: 
+    inset 0 4px 8px rgba(0, 0, 0, 0.6),
+    0 8px 20px rgba(0, 0, 0, 0.5);
+  border: 3px solid #654321;
+  min-width: 280px;
+  margin: 15px 0;
+}
+
+/* Inputs de tempo */
 .time-inputs {
   display: flex;
   gap: 8px;
   align-items: center;
-  justify-content: center;
   margin: 15px 0;
-  width: 100%;
 }
 
 .time-inputs input {
-  width: 60px;
-  padding: 10px;
-  font-size: 20px;
-  font-weight: bold;
+  width: 70px;
+  padding: 12px;
+  font-size: 24px;
+  font-family: 'Georgia', serif;
   text-align: center;
-  background: rgba(0, 255, 136, 0.1);
-  border: 2px solid rgba(0, 255, 136, 0.3);
+  background: linear-gradient(145deg, #e8dfc5, #d4c4a0);
+  border: 2px solid #8b7355;
   border-radius: 8px;
-  color: #00ff88;
-  font-family: 'Courier New', monospace;
+  color: #2c1810;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .time-inputs input:focus {
   outline: none;
-  border-color: #00ff88;
-  box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
-}
-
-.time-inputs input::placeholder {
-  color: rgba(0, 255, 136, 0.4);
+  border-color: #654321;
+  box-shadow: 
+    inset 0 2px 5px rgba(0, 0, 0, 0.2),
+    0 0 8px rgba(139, 115, 85, 0.5);
 }
 
 .time-inputs span {
-  color: #00ff88;
-  font-size: 24px;
+  font-size: 28px;
+  color: #d4c4a0;
   font-weight: bold;
 }
 
 /* Controles */
 .controls {
   display: flex;
-  gap: 10px;
-  width: 100%;
+  gap: 12px;
   margin-top: 15px;
+  width: 100%;
+  justify-content: center;
 }
 
 .btn {
   flex: 1;
-  padding: 12px 8px;
-  font-size: 13px;
+  padding: 14px 20px;
+  font-size: 14px;
+  font-family: 'Georgia', serif;
   font-weight: bold;
-  border: none;
-  border-radius: 8px;
+  letter-spacing: 1.5px;
+  border-radius: 10px;
+  border: 2px solid;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
   text-transform: uppercase;
-  letter-spacing: 1px;
-  font-family: 'Courier New', monospace;
 }
 
 .btn-start {
-  background: linear-gradient(135deg, #00ff88 0%, #00aa55 100%);
-  color: #0a0e27;
-  box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+  background: linear-gradient(145deg, #2d5016, #1f3810);
+  color: #c8e6c9;
+  border-color: #4a7c2c;
 }
 
 .btn-start:hover {
-  box-shadow: 0 6px 20px rgba(0, 255, 136, 0.5);
+  background: linear-gradient(145deg, #3d6826, #2d5016);
+  border-color: #5a9c3c;
   transform: translateY(-2px);
-}
-
-.btn-start:active {
-  transform: translateY(0);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6);
 }
 
 .btn-pause {
-  background: linear-gradient(135deg, #ffaa00 0%, #ff6600 100%);
-  color: #0a0e27;
-  box-shadow: 0 4px 15px rgba(255, 170, 0, 0.3);
+  background: linear-gradient(145deg, #7d5a1f, #5d4a1f);
+  color: #ffe4b5;
+  border-color: #9d7a3f;
 }
 
 .btn-pause:hover {
-  box-shadow: 0 6px 20px rgba(255, 170, 0, 0.5);
+  background: linear-gradient(145deg, #8d6a2f, #7d5a1f);
+  border-color: #ad8a4f;
   transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6);
 }
 
 .btn-reset {
-  background: rgba(255, 255, 255, 0.1);
-  color: #00ff88;
-  border: 2px solid rgba(0, 255, 136, 0.3);
-  box-shadow: 0 4px 15px rgba(0, 255, 136, 0.1);
+  background: linear-gradient(145deg, #7d2a1f, #5d1a1f);
+  color: #ffcccb;
+  border-color: #9d3a2f;
 }
 
 .btn-reset:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: #00ff88;
-  box-shadow: 0 6px 20px rgba(0, 255, 136, 0.3);
+  background: linear-gradient(145deg, #8d3a2f, #7d2a1f);
+  border-color: #ad4a3f;
   transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6);
 }
 
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none !important;
+.btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
 }
 
-/* Animações */
-@keyframes pulse {
-  0%, 100% {
-    text-shadow: 
-      0 0 10px #00ff88,
-      0 0 20px #00ff88,
-      0 0 30px #00ff88,
-      0 0 40px #00aa55;
+/* Responsividade */
+@media (max-width: 400px) {
+  body {
+    width: 100vw;
+    height: 100vh;
   }
-  50% {
-    text-shadow: 
-      0 0 5px #00ff88,
-      0 0 10px #00ff88,
-      0 0 15px #00ff88,
-      0 0 20px #00aa55;
+  
+  .analog-clock-container {
+    max-width: 280px;
+    height: 280px;
   }
-}
-
-.timer-display.running {
-  animation: pulse 2s ease-in-out infinite;
+  
+  .timer-display {
+    font-size: 42px;
+    padding: 18px 25px;
+  }
 }
