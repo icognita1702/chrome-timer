@@ -1,89 +1,98 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
-  width: 300px;
-  padding: 20px;
-  font-family: Arial, sans-serif;
-  background-color: #f5f5f5;
+  width: 320px;
+  height: 240px;
+  background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+  font-family: 'Courier New', monospace;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
 }
 
 .container {
-  background-color: white;
-  border-radius: 10px;
+  width: 100%;
   padding: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
 }
 
-h1 {
-  text-align: center;
-  color: #333;
-  margin-top: 0;
-}
-
-#display {
-  font-size: 48px;
-  text-align: center;
-  margin: 20px 0;
-  color: #2196F3;
+.timer-display {
+  font-size: 56px;
   font-weight: bold;
+  color: #00ff88;
+  text-shadow: 
+    0 0 10px #00ff88,
+    0 0 20px #00ff88,
+    0 0 30px #00ff88,
+    0 0 40px #00aa55;
+  letter-spacing: 8px;
+  margin-bottom: 30px;
+  background: rgba(0, 255, 136, 0.05);
+  padding: 20px;
+  border-radius: 10px;
+  border: 2px solid #00ff88;
+  box-shadow: 
+    inset 0 0 20px rgba(0, 255, 136, 0.2),
+    0 0 20px rgba(0, 255, 136, 0.3);
 }
 
 .controls {
   display: flex;
-  justify-content: space-around;
-  margin: 20px 0;
+  justify-content: center;
+  gap: 15px;
 }
 
-.controls button {
-  padding: 10px 20px;
-  border: none;
+.btn {
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+  border: 2px solid;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.3s;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: all 0.3s ease;
+  background: transparent;
 }
 
-#startBtn {
-  background-color: #4CAF50;
-  color: white;
+.btn-start {
+  color: #00ff88;
+  border-color: #00ff88;
+  text-shadow: 0 0 5px #00ff88;
 }
 
-#startBtn:hover {
-  background-color: #45a049;
+.btn-start:hover {
+  background: #00ff88;
+  color: #0a0e27;
+  box-shadow: 0 0 15px #00ff88;
 }
 
-#pauseBtn {
-  background-color: #FF9800;
-  color: white;
+.btn-pause {
+  color: #ffa500;
+  border-color: #ffa500;
+  text-shadow: 0 0 5px #ffa500;
 }
 
-#pauseBtn:hover {
-  background-color: #e68900;
+.btn-pause:hover {
+  background: #ffa500;
+  color: #0a0e27;
+  box-shadow: 0 0 15px #ffa500;
 }
 
-#resetBtn {
-  background-color: #f44336;
-  color: white;
+.btn-reset {
+  color: #ff0055;
+  border-color: #ff0055;
+  text-shadow: 0 0 5px #ff0055;
 }
 
-#resetBtn:hover {
-  background-color: #da190b;
-}
-
-.input-group {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.input-group label {
-  margin-right: 10px;
-  color: #666;
-}
-
-.input-group input {
-  width: 60px;
-  padding: 5px;
-  border: 1px solid #ddd;
-  border-radius: 3px;
-  text-align: center;
+.btn-reset:hover {
+  background: #ff0055;
+  color: #0a0e27;
+  box-shadow: 0 0 15px #ff0055;
 }
