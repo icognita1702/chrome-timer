@@ -1,15 +1,22 @@
 // Elementos DOM
-const display = document.getElementById('display');
 const tabs = document.querySelectorAll('.tab');
-const startBtn = document.getElementById('startBtn');
-const pauseBtn = document.getElementById('pauseBtn');
-const resetBtn = document.getElementById('resetBtn');
-const timeInputs = document.getElementById('timeInputs');
+const analogClockContainer = document.getElementById('analogClockContainer');
+const stopwatchContainer = document.getElementById('stopwatchContainer');
+const countdownContainer = document.getElementById('countdownContainer');
+
+// Elementos do cronômetro
+const stopwatchDisplay = document.getElementById('stopwatchDisplay');
+const startStopwatch = document.getElementById('startStopwatch');
+const resetStopwatch = document.getElementById('resetStopwatch');
+
+// Elementos do timer
+const countdownDisplay = document.getElementById('countdownDisplay');
 const hoursInput = document.getElementById('hoursInput');
 const minutesInput = document.getElementById('minutesInput');
 const secondsInput = document.getElementById('secondsInput');
-const controls = document.getElementById('controls');
-const analogClockContainer = document.getElementById('analogClockContainer');
+const startCountdown = document.getElementById('startCountdown');
+const pauseCountdown = document.getElementById('pauseCountdown');
+const resetCountdown = document.getElementById('resetCountdown');
 
 // Elementos do relógio analógico
 const hourHand = document.getElementById('hourHand');
@@ -18,15 +25,19 @@ const secondHand = document.getElementById('secondHand');
 
 // Estado da aplicação
 let currentMode = 'clock';
-let timerInterval = null;
-let totalSeconds = 0;
-let isRunning = false;
 let clockInterval = null;
+let stopwatchInterval = null;
+let stopwatchTime = 0;
+let stopwatchRunning = false;
+let countdownInterval = null;
+let countdownTime = 0;
+let countdownRunning = false;
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', () => {
   setupTabListeners();
-  setupButtonListeners();
+  setupStopwatchListeners();
+  setupCountdownListeners();
   initMode();
 });
 
@@ -40,33 +51,49 @@ function setupTabListeners() {
   });
 }
 
-// Configurar listeners dos botões
-function setupButtonListeners() {
-  startBtn.addEventListener('click', startTimer);
-  pauseBtn.addEventListener('click', pauseTimer);
-  resetBtn.addEventListener('click', resetTimer);
+// Configurar listeners do cronômetro
+function setupStopwatchListeners() {
+  startStopwatch.addEventListener('click', () => {
+    if (stopwatchRunning) {
+      stopStopwatch();
+    } else {
+      startStopwatchTimer();
+    }
+  });
+  
+  resetStopwatch.addEventListener('click', () => {
+    resetStopwatchTimer();
+  });
 }
 
-// Inicializar modo
-function initMode() {
-  switchMode(currentMode);
+// Configurar listeners do timer
+function setupCountdownListeners() {
+  startCountdown.addEventListener('click', () => {
+    if (!countdownRunning) {
+      const hours = parseInt(hoursInput.value) || 0;
+      const minutes = parseInt(minutesInput.value) || 0;
+      const seconds = parseInt(secondsInput.value) || 0;
+      countdownTime = hours * 3600 + minutes * 60 + seconds;
+      if (countdownTime > 0) {
+        startCountdownTimer();
+      }
+    }
+  });
+  
+  pauseCountdown.addEventListener('click', () => {
+    if (countdownRunning) {
+      pauseCountdownTimer();
+    }
+  });
+  
+  resetCountdown.addEventListener('click', () => {
+    resetCountdownTimer();
+  });
 }
 
 // Trocar modo
 function switchMode(mode) {
-  // Parar qualquer timer ativo
-  if (timerInterval) {
-    clearInterval(timerInterval);
-    timerInterval = null;
-  }
-  if (clockInterval) {
-    clearInterval(clockInterval);
-    clockInterval = null;
-  }
-  
-  // Resetar estado
-  isRunning = false;
-  totalSeconds = 0;
+  currentMode = mode;
   
   // Atualizar abas ativas
   tabs.forEach(tab => {
@@ -77,144 +104,188 @@ function switchMode(mode) {
     }
   });
   
-  currentMode = mode;
+  // Parar todos os timers
+  stopClock();
+  stopStopwatch();
+  pauseCountdownTimer();
   
-  // Mostrar/ocultar elementos conforme o modo
+  // Mostrar conteúdo correto
+  analogClockContainer.style.display = mode === 'clock' ? 'flex' : 'none';
+  stopwatchContainer.style.display = mode === 'stopwatch' ? 'block' : 'none';
+  countdownContainer.style.display = mode === 'countdown' ? 'block' : 'none';
+  
+  // Inicializar modo
   if (mode === 'clock') {
-    analogClockContainer.style.display = 'flex';
-    display.style.display = 'none';
-    timeInputs.style.display = 'none';
-    controls.style.display = 'none';
-    startAnalogClock();
-  } else {
-    analogClockContainer.style.display = 'none';
-    display.style.display = 'block';
-    controls.style.display = 'flex';
-    
-    if (mode === 'countdown') {
-      timeInputs.style.display = 'flex';
-    } else {
-      timeInputs.style.display = 'none';
-    }
-    
-    updateDisplay();
-    startBtn.style.display = 'inline-block';
-    pauseBtn.style.display = 'none';
+    startClock();
   }
 }
 
-// Funções do Relógio Analógico
-function startAnalogClock() {
-  updateAnalogClock();
-  clockInterval = setInterval(updateAnalogClock, 1000);
+// Inicializar modo
+function initMode() {
+  switchMode(currentMode);
 }
 
-function updateAnalogClock() {
+// ========== RELÓGIO ANALÓGICO ==========
+
+function startClock() {
+  updateClock();
+  clockInterval = setInterval(updateClock, 1000);
+}
+
+function stopClock() {
+  if (clockInterval) {
+    clearInterval(clockInterval);
+    clockInterval = null;
+  }
+}
+
+function updateClock() {
   const now = new Date();
-  const hours = now.getHours() % 12;
+  const hours = now.getHours();
   const minutes = now.getMinutes();
   const seconds = now.getSeconds();
-  const milliseconds = now.getMilliseconds();
   
-  // Cálculo dos ângulos (considerando 12h no topo = 0°)
-  // Cada segundo = 6° (360/60)
-  // Cada minuto = 6° (360/60) + ajuste suave dos segundos
-  // Cada hora = 30° (360/12) + ajuste dos minutos
+  // Calcular ângulos (0 graus = 12h, sentido horário)
+  const secondAngle = (seconds * 6) - 90; // 6 graus por segundo
+  const minuteAngle = (minutes * 6 + seconds * 0.1) - 90; // 6 graus por minuto + movimento suave
+  const hourAngle = ((hours % 12) * 30 + minutes * 0.5) - 90; // 30 graus por hora + movimento suave
   
-  const secondAngle = (seconds + milliseconds / 1000) * 6;
-  const minuteAngle = minutes * 6 + seconds * 0.1;
-  const hourAngle = hours * 30 + minutes * 0.5;
+  // Calcular posições dos ponteiros
+  const cx = 200; // centro x
+  const cy = 200; // centro y
   
-  // Aplicar rotações aos ponteiros
-  if (secondHand) {
-    secondHand.style.transform = `rotate(${secondAngle}deg)`;
-  }
-  if (minuteHand) {
-    minuteHand.style.transform = `rotate(${minuteAngle}deg)`;
-  }
+  // Ponteiro das horas (comprimento: 80 pixels)
+  const hourX = cx + 80 * Math.cos(hourAngle * Math.PI / 180);
+  const hourY = cy + 80 * Math.sin(hourAngle * Math.PI / 180);
+  
+  // Ponteiro dos minutos (comprimento: 120 pixels)
+  const minuteX = cx + 120 * Math.cos(minuteAngle * Math.PI / 180);
+  const minuteY = cy + 120 * Math.sin(minuteAngle * Math.PI / 180);
+  
+  // Ponteiro dos segundos (comprimento: 130 pixels)
+  const secondX = cx + 130 * Math.cos(secondAngle * Math.PI / 180);
+  const secondY = cy + 130 * Math.sin(secondAngle * Math.PI / 180);
+  
+  // Aplicar transformações
   if (hourHand) {
-    hourHand.style.transform = `rotate(${hourAngle}deg)`;
+    hourHand.setAttribute('x2', hourX);
+    hourHand.setAttribute('y2', hourY);
+  }
+  
+  if (minuteHand) {
+    minuteHand.setAttribute('x2', minuteX);
+    minuteHand.setAttribute('y2', minuteY);
+  }
+  
+  if (secondHand) {
+    secondHand.setAttribute('x2', secondX);
+    secondHand.setAttribute('y2', secondY);
   }
 }
 
-// Funções do Timer/Cronômetro
-function updateDisplay() {
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
+// ========== CRONÔMETRO ==========
+
+function startStopwatchTimer() {
+  stopwatchRunning = true;
+  startStopwatch.textContent = 'Pausar';
+  stopwatchInterval = setInterval(() => {
+    stopwatchTime++;
+    updateStopwatchDisplay();
+  }, 10);
+}
+
+function stopStopwatch() {
+  stopwatchRunning = false;
+  startStopwatch.textContent = 'Iniciar';
+  if (stopwatchInterval) {
+    clearInterval(stopwatchInterval);
+    stopwatchInterval = null;
+  }
+}
+
+function resetStopwatchTimer() {
+  stopStopwatch();
+  stopwatchTime = 0;
+  updateStopwatchDisplay();
+}
+
+function updateStopwatchDisplay() {
+  const centiseconds = stopwatchTime % 100;
+  const totalSeconds = Math.floor(stopwatchTime / 100);
   const seconds = totalSeconds % 60;
+  const minutes = Math.floor(totalSeconds / 60) % 60;
+  const hours = Math.floor(totalSeconds / 3600);
   
-  display.textContent = `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+  stopwatchDisplay.textContent = 
+    `${pad(hours)}:${pad(minutes)}:${pad(seconds)}.${pad(centiseconds)}`;
 }
 
-function pad(num) {
-  return num.toString().padStart(2, '0');
-}
+// ========== TIMER DE CONTAGEM REGRESSIVA ==========
 
-function startTimer() {
-  if (currentMode === 'countdown' && !isRunning) {
-    // Obter valores dos inputs
-    const hours = parseInt(hoursInput.value) || 0;
-    const minutes = parseInt(minutesInput.value) || 0;
-    const seconds = parseInt(secondsInput.value) || 0;
-    
-    totalSeconds = hours * 3600 + minutes * 60 + seconds;
-    
-    if (totalSeconds === 0) {
-      alert('Por favor, defina um tempo para a contagem regressiva!');
-      return;
-    }
-  }
-  
-  isRunning = true;
-  startBtn.style.display = 'none';
-  pauseBtn.style.display = 'inline-block';
-  
-  timerInterval = setInterval(() => {
-    if (currentMode === 'stopwatch') {
-      totalSeconds++;
-      updateDisplay();
-    } else if (currentMode === 'countdown') {
-      if (totalSeconds > 0) {
-        totalSeconds--;
-        updateDisplay();
-      } else {
-        // Timer terminou
-        pauseTimer();
-        playAlertSound();
-      }
+function startCountdownTimer() {
+  countdownRunning = true;
+  startCountdown.disabled = true;
+  pauseCountdown.disabled = false;
+  countdownInterval = setInterval(() => {
+    if (countdownTime > 0) {
+      countdownTime--;
+      updateCountdownDisplay();
+    } else {
+      // Timer finalizado
+      resetCountdownTimer();
+      playAlarm();
     }
   }, 1000);
 }
 
-function pauseTimer() {
-  isRunning = false;
-  
-  if (timerInterval) {
-    clearInterval(timerInterval);
-    timerInterval = null;
-  }
-  
-  startBtn.style.display = 'inline-block';
-  pauseBtn.style.display = 'none';
-}
-
-function resetTimer() {
-  pauseTimer();
-  totalSeconds = 0;
-  updateDisplay();
-  
-  // Limpar inputs do countdown
-  if (currentMode === 'countdown') {
-    hoursInput.value = '';
-    minutesInput.value = '';
-    secondsInput.value = '';
+function pauseCountdownTimer() {
+  countdownRunning = false;
+  startCountdown.disabled = false;
+  pauseCountdown.disabled = true;
+  if (countdownInterval) {
+    clearInterval(countdownInterval);
+    countdownInterval = null;
   }
 }
 
-function playAlertSound() {
-  // Criar um alerta visual quando o timer terminar
-  display.style.backgroundColor = '#d32f2f';
-  setTimeout(() => {
-    display.style.backgroundColor = '';
-  }, 500);
+function resetCountdownTimer() {
+  pauseCountdownTimer();
+  countdownTime = 0;
+  hoursInput.value = '';
+  minutesInput.value = '';
+  secondsInput.value = '';
+  updateCountdownDisplay();
+}
+
+function updateCountdownDisplay() {
+  const hours = Math.floor(countdownTime / 3600);
+  const minutes = Math.floor((countdownTime % 3600) / 60);
+  const seconds = countdownTime % 60;
+  
+  countdownDisplay.textContent = `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+}
+
+function playAlarm() {
+  // Notificação sonora simples usando a API de notificações do navegador
+  if (Notification.permission === 'granted') {
+    new Notification('Timer Finalizado!', {
+      body: 'O tempo acabou!',
+      icon: 'icon.png'
+    });
+  } else if (Notification.permission !== 'denied') {
+    Notification.requestPermission().then(permission => {
+      if (permission === 'granted') {
+        new Notification('Timer Finalizado!', {
+          body: 'O tempo acabou!',
+          icon: 'icon.png'
+        });
+      }
+    });
+  }
+}
+
+// ========== FUNÇÕES AUXILIARES ==========
+
+function pad(num) {
+  return num.toString().padStart(2, '0');
 }
