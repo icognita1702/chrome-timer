@@ -3,15 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Futuristic Timer</title>
+  <title>Timer Digital</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
   <div class="container">
+    <!-- Abas de Modo -->
+    <div class="mode-tabs">
+      <button class="tab active" data-mode="clock">RELÓGIO</button>
+      <button class="tab" data-mode="stopwatch">CRONÔMETRO</button>
+      <button class="tab" data-mode="countdown">TIMER</button>
+    </div>
+
+    <!-- Display Digital -->
     <div class="timer-display" id="display">00:00:00</div>
-    <div class="controls">
+
+    <!-- Controles do Timer/Countdown -->
+    <div class="time-inputs" id="timeInputs" style="display: none;">
+      <input type="number" id="hoursInput" min="0" max="23" placeholder="HH">
+      <span>:</span>
+      <input type="number" id="minutesInput" min="0" max="59" placeholder="MM">
+      <span>:</span>
+      <input type="number" id="secondsInput" min="0" max="59" placeholder="SS">
+    </div>
+
+    <!-- Botões de Controle -->
+    <div class="controls" id="controls">
       <button id="startBtn" class="btn btn-start">START</button>
-      <button id="pauseBtn" class="btn btn-pause">PAUSE</button>
+      <button id="pauseBtn" class="btn btn-pause" style="display: none;">PAUSE</button>
       <button id="resetBtn" class="btn btn-reset">RESET</button>
     </div>
   </div>
