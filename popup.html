@@ -10,13 +10,14 @@
   <div class="container">
     <!-- Abas de Modo -->
     <div class="mode-tabs">
-      <button class="tab active" data-mode="clock">RELÓGIO</button>
-      <button class="tab" data-mode="stopwatch">CRONÔMETRO</button>
-      <button class="tab" data-mode="countdown">TIMER</button>
+      <button class="mode-tab active" data-mode="clock">RELÓGIO</button>
+      <button class="mode-tab" data-mode="stopwatch">CRONÔMETRO</button>
+      <button class="mode-tab" data-mode="countdown">TIMER</button>
     </div>
-    <!-- Modo Relógio Analógico Vintage -->
-    <div class="analog-clock-container" id="analogClockContainer">
-      <svg id="analogClock" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Relógio Vintage -->
+    <div class="clock-container">
+      <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
         <!-- Sombra externa -->
         <defs>
           <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
@@ -36,68 +37,67 @@
             <stop offset="100%" style="stop-color:#d4c5a0;stop-opacity:1" />
           </radialGradient>
         </defs>
-        <!-- Círculo externo com sombra -->
-        <circle cx="200" cy="200" r="190" fill="#8b6f47" filter="url(#shadow)"/>
-        <!-- Círculo do mostrador -->
-        <circle cx="200" cy="200" r="180" fill="url(#clockFace)" stroke="#8b6f47" stroke-width="3"/>
-        <!-- Marcadores das horas -->
-        <line x1="200" y1="40" x2="200" y2="60" stroke="#2c2416" stroke-width="4" stroke-linecap="round"/>
-        <line x1="200" y1="340" x2="200" y2="360" stroke="#2c2416" stroke-width="4" stroke-linecap="round"/>
-        <line x1="40" y1="200" x2="60" y2="200" stroke="#2c2416" stroke-width="4" stroke-linecap="round"/>
-        <line x1="340" y1="200" x2="360" y2="200" stroke="#2c2416" stroke-width="4" stroke-linecap="round"/>
-        <!-- Marcadores intermediários (1, 2, 4, 5, 7, 8, 10, 11) -->
-        <line x1="253.82" y1="53.82" x2="265.06" y2="65.06" stroke="#2c2416" stroke-width="3" stroke-linecap="round"/>
-        <line x1="334.94" y1="134.94" x2="346.18" y2="146.18" stroke="#2c2416" stroke-width="3" stroke-linecap="round"/>
-        <line x1="334.94" y1="265.06" x2="346.18" y2="253.82" stroke="#2c2416" stroke-width="3" stroke-linecap="round"/>
-        <line x1="253.82" y1="346.18" x2="265.06" y2="334.94" stroke="#2c2416" stroke-width="3" stroke-linecap="round"/>
-        <line x1="146.18" y1="346.18" x2="134.94" y2="334.94" stroke="#2c2416" stroke-width="3" stroke-linecap="round"/>
-        <line x1="65.06" y1="265.06" x2="53.82" y2="253.82" stroke="#2c2416" stroke-width="3" stroke-linecap="round"/>
-        <line x1="65.06" y1="134.94" x2="53.82" y2="146.18" stroke="#2c2416" stroke-width="3" stroke-linecap="round"/>
-        <line x1="146.18" y1="53.82" x2="134.94" y2="65.06" stroke="#2c2416" stroke-width="3" stroke-linecap="round"/>
-        <!-- Números das horas -->
-        <text x="200" y="75" text-anchor="middle" font-size="28" font-family="Georgia, serif" font-weight="bold" fill="#2c2416">12</text>
-        <text x="325" y="210" text-anchor="middle" font-size="28" font-family="Georgia, serif" font-weight="bold" fill="#2c2416">3</text>
-        <text x="200" y="340" text-anchor="middle" font-size="28" font-family="Georgia, serif" font-weight="bold" fill="#2c2416">6</text>
-        <text x="75" y="210" text-anchor="middle" font-size="28" font-family="Georgia, serif" font-weight="bold" fill="#2c2416">9</text>
-        <!-- Centro decorativo -->
-        <circle cx="200" cy="200" r="12" fill="#8b6f47" stroke="#2c2416" stroke-width="2"/>
-        <!-- Ponteiros (serão animados via JavaScript) -->
-        <line id="hourHand" x1="200" y1="200" x2="200" y2="120" stroke="#2c2416" stroke-width="8" stroke-linecap="round"/>
-        <line id="minuteHand" x1="200" y1="200" x2="200" y2="80" stroke="#2c2416" stroke-width="6" stroke-linecap="round"/>
-        <line id="secondHand" x1="200" y1="200" x2="200" y2="70" stroke="#c41e3a" stroke-width="2" stroke-linecap="round"/>
-        <!-- Centro final -->
-        <circle cx="200" cy="200" r="8" fill="#c41e3a" stroke="#2c2416" stroke-width="1"/>
+
+        <!-- Moldura externa (madeira escura) -->
+        <circle cx="200" cy="200" r="195" fill="#3d2817" filter="url(#shadow)"/>
+        <circle cx="200" cy="200" r="185" fill="#8b4513"/>
+        <circle cx="200" cy="200" r="175" fill="#654321"/>
+        
+        <!-- Face do relógio -->
+        <circle cx="200" cy="200" r="165" fill="url(#clockFace)" stroke="#8b4513" stroke-width="3"/>
+
+        <!-- Marcações de hora -->
+        <g id="hour-markers">
+          <!-- 12 -->
+          <rect x="197" y="50" width="6" height="25" fill="#2a1810" rx="3"/>
+          <!-- 3 -->
+          <rect x="325" y="197" width="25" height="6" fill="#2a1810" rx="3"/>
+          <!-- 6 -->
+          <rect x="197" y="325" width="6" height="25" fill="#2a1810" rx="3"/>
+          <!-- 9 -->
+          <rect x="50" y="197" width="25" height="6" fill="#2a1810" rx="3"/>
+        </g>
+
+        <!-- Números -->
+        <text x="200" y="70" font-size="30" font-weight="bold" fill="#2a1810" text-anchor="middle" dominant-baseline="middle">12</text>
+        <text x="330" y="210" font-size="30" font-weight="bold" fill="#2a1810" text-anchor="middle" dominant-baseline="middle">3</text>
+        <text x="200" y="350" font-size="30" font-weight="bold" fill="#2a1810" text-anchor="middle" dominant-baseline="middle">6</text>
+        <text x="70" y="210" font-size="30" font-weight="bold" fill="#2a1810" text-anchor="middle" dominant-baseline="middle">9</text>
+
+        <!-- Ponteiros -->
+        <g id="clock-hands">
+          <!-- Ponteiro das horas -->
+          <line id="hour-hand" x1="200" y1="200" x2="200" y2="120" stroke="#2a1810" stroke-width="8" stroke-linecap="round"/>
+          <!-- Ponteiro dos minutos -->
+          <line id="minute-hand" x1="200" y1="200" x2="200" y2="90" stroke="#654321" stroke-width="6" stroke-linecap="round"/>
+          <!-- Ponteiro dos segundos -->
+          <line id="second-hand" x1="200" y1="200" x2="200" y2="70" stroke="#d4af37" stroke-width="2" stroke-linecap="round"/>
+        </g>
+
+        <!-- Centro do relógio -->
+        <circle cx="200" cy="200" r="12" fill="#8b4513" stroke="#d4af37" stroke-width="2"/>
+        <circle cx="200" cy="200" r="6" fill="#d4af37"/>
+
+        <!-- Display digital no centro -->
+        <text id="timer-display" x="200" y="270" font-size="24" font-weight="bold" fill="#2a1810" text-anchor="middle" dominant-baseline="middle">00:00:00</text>
       </svg>
     </div>
-    <!-- Modo Cronômetro -->
-    <div class="stopwatch-container" id="stopwatchContainer" style="display:none;">
-      <div class="display">
-        <span id="stopwatchDisplay">00:00:00.00</span>
-      </div>
-      <div class="controls">
-        <button id="startStopwatch" class="btn">Iniciar</button>
-        <button id="resetStopwatch" class="btn">Resetar</button>
-      </div>
+
+    <!-- Controles -->
+    <div class="controls">
+      <button class="control-btn" id="startBtn">INICIAR</button>
+      <button class="control-btn" id="resetBtn">RESETAR</button>
     </div>
-    <!-- Modo Timer de Contagem Regressiva -->
-    <div class="countdown-container" id="countdownContainer" style="display:none;">
-      <div class="display">
-        <span id="countdownDisplay">00:00:00</span>
-      </div>
-      <div class="input-group">
-        <input type="number" id="hoursInput" min="0" max="23" placeholder="HH">
-        <span>:</span>
-        <input type="number" id="minutesInput" min="0" max="59" placeholder="MM">
-        <span>:</span>
-        <input type="number" id="secondsInput" min="0" max="59" placeholder="SS">
-      </div>
-      <div class="controls">
-        <button id="startCountdown" class="btn">Iniciar</button>
-        <button id="pauseCountdown" class="btn">Pausar</button>
-        <button id="resetCountdown" class="btn">Resetar</button>
-      </div>
+
+    <!-- Configuração de Timer (aparece apenas no modo countdown) -->
+    <div class="timer-config" id="timerConfig">
+      <label for="timerMinutes">Minutos:</label>
+      <input type="number" id="timerMinutes" min="0" max="59" value="25">
+      <label for="timerSeconds">Segundos:</label>
+      <input type="number" id="timerSeconds" min="0" max="59" value="0">
     </div>
   </div>
+
   <script src="popup.js"></script>
 </body>
 </html>
