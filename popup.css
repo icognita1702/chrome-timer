@@ -1,21 +1,40 @@
+/* ===================================
+   RESET E BOX-SIZING UNIVERSAL
+   Elimina margens/padding padrão e garante box-sizing consistente
+   =================================== */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* ===================================
+   BODY - DIMENSÕES FIXAS PARA POPUP CHROME
+   min/max com !important garantem dimensões exatas 320x480px
+   Flexbox centraliza todo o conteúdo
+   overflow: hidden previne scrollbars indesejados
+   =================================== */
 body {
-  width: 320px;
-  min-height: 480px;
-  max-height: 600px;
+  min-width: 320px !important;
+  max-width: 320px !important;
+  min-height: 480px !important;
+  max-height: 480px !important;
+  width: 320px !important;
+  height: 480px !important;
   background: linear-gradient(135deg, #2a1810 0%, #1a0f08 100%);
   font-family: 'Georgia', serif;
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
+  position: relative;
 }
 
+/* ===================================
+   CONTAINER PRINCIPAL
+   Ocupa 100% do body, centralizado com flexbox
+   gap mantém espaçamento consistente entre elementos
+   =================================== */
 .container {
   width: 100%;
   height: 100%;
@@ -25,53 +44,76 @@ body {
   justify-content: center;
   align-items: center;
   gap: 10px;
+  margin: 0 auto;
 }
 
-/* Abas de Modo */
+/* ===================================
+   ABAS DE MODO (Timer/Pomodoro)
+   Flexbox com gap para espaçamento uniforme
+   Transições suaves para hover/active states
+   =================================== */
 .mode-tabs {
   display: flex;
   gap: 8px;
   margin-bottom: 10px;
   width: 100%;
+  max-width: 290px;
   justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .mode-tab {
   flex: 1;
   padding: 8px 12px;
   background: rgba(139, 69, 19, 0.3);
-  border: 2px solid #8b4513;
-  border-radius: 5px;
+  border: 1px solid #8b4513;
+  border-radius: 8px;
   color: #d4af37;
   cursor: pointer;
-  font-size: 12px;
-  font-weight: bold;
-  text-align: center;
   transition: all 0.3s ease;
+  font-size: 12px;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .mode-tab:hover {
   background: rgba(139, 69, 19, 0.5);
   transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .mode-tab.active {
-  background: #8b4513;
-  box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+  background: rgba(212, 175, 55, 0.2);
+  border-color: #d4af37;
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+  font-weight: bold;
 }
 
-/* Relógio Vintage */
+/* ===================================
+   CLOCK CONTAINER - RESPONSIVO COM ASPECT-RATIO
+   aspect-ratio: 1 mantém proporção quadrada
+   max-width previne overflow no popup
+   margin: 0 auto garante centralização
+   =================================== */
 .clock-container {
   width: 100%;
-  max-width: 280px;
+  max-width: 260px;
   aspect-ratio: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 10px auto;
+  margin: 0 auto;
+  position: relative;
 }
 
-.clock-container svg {
+/* ===================================
+   SVG DO RELÓGIO - 100% RESPONSIVO
+   Remove dimensões fixas (width/height)
+   max-width/max-height previnem overflow
+   display: block remove espaço extra inline
+   =================================== */
+.clock-svg {
   width: 100%;
   height: 100%;
   max-width: 100%;
@@ -79,40 +121,84 @@ body {
   display: block;
 }
 
-#timer-display {
-  font-size: 20px;
-  font-weight: bold;
-  fill: #2a1810;
+/* ===================================
+   ELEMENTOS SVG DO RELÓGIO
+   Estilos visuais para círculos e texto
+   =================================== */
+.clock-face {
+  fill: none;
+  stroke: #3d2817;
+  stroke-width: 2;
+}
+
+.clock-border {
+  fill: none;
+  stroke: #8b4513;
+  stroke-width: 3;
+}
+
+.clock-progress {
+  fill: none;
+  stroke: #d4af37;
+  stroke-width: 4;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.3s linear;
+  transform: rotate(-90deg);
+  transform-origin: center;
+}
+
+.time-display {
+  font-size: 48px;
+  fill: #d4af37;
   text-anchor: middle;
+  font-family: 'Georgia', serif;
+  font-weight: bold;
   dominant-baseline: middle;
 }
 
-/* Botões de controle */
+.session-label {
+  font-size: 14px;
+  fill: #cd853f;
+  text-anchor: middle;
+  font-family: 'Georgia', serif;
+  dominant-baseline: middle;
+}
+
+/* ===================================
+   CONTROLES (Start/Pause/Reset)
+   flex-wrap permite quebra em telas menores
+   min-width garante botões clicáveis
+   =================================== */
 .controls {
   display: flex;
   gap: 10px;
-  margin-top: 10px;
-  width: 100%;
   justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 290px;
+  flex-wrap: wrap;
+  margin: 0 auto;
 }
 
 .control-btn {
   padding: 10px 20px;
-  background: linear-gradient(135deg, #8b4513, #654321);
-  border: 2px solid #d4af37;
+  background: rgba(139, 69, 19, 0.3);
+  border: 2px solid #8b4513;
   border-radius: 8px;
   color: #d4af37;
-  font-size: 14px;
-  font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  font-size: 14px;
+  font-family: 'Georgia', serif;
+  min-width: 85px;
+  font-weight: 500;
+  text-transform: capitalize;
 }
 
 .control-btn:hover {
-  background: linear-gradient(135deg, #a0522d, #8b4513);
+  background: rgba(139, 69, 19, 0.5);
   transform: translateY(-2px);
-  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .control-btn:active {
@@ -120,57 +206,122 @@ body {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* Timer Config (para modo personalizado) */
-.timer-config {
-  display: none;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 10px;
+.control-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ===================================
+   CONFIGURAÇÕES (Settings Panel)
+   width: 100% com max-width previne overflow
+   =================================== */
+.settings {
   width: 100%;
-  padding: 10px;
+  max-width: 290px;
+  padding: 12px;
   background: rgba(139, 69, 19, 0.2);
   border: 1px solid #8b4513;
   border-radius: 8px;
+  margin: 0 auto;
 }
 
-.timer-config.active {
-  display: flex;
+.setting-group {
+  margin-bottom: 10px;
 }
 
-.timer-config label {
+.setting-group:last-child {
+  margin-bottom: 0;
+}
+
+.setting-group label {
+  display: block;
   color: #d4af37;
   font-size: 12px;
-  font-weight: bold;
+  margin-bottom: 4px;
+  font-weight: 500;
 }
 
-.timer-config input {
-  padding: 8px;
-  background: rgba(42, 24, 16, 0.8);
-  border: 2px solid #8b4513;
-  border-radius: 5px;
+.setting-group input {
+  width: 100%;
+  padding: 6px 8px;
+  background: rgba(42, 24, 16, 0.5);
+  border: 1px solid #8b4513;
+  border-radius: 4px;
   color: #d4af37;
-  font-size: 14px;
   font-family: 'Georgia', serif;
+  font-size: 14px;
 }
 
-.timer-config input:focus {
+.setting-group input:focus {
   outline: none;
   border-color: #d4af37;
-  box-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
+  box-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
 }
 
-/* Responsividade */
+/* ===================================
+   ESTADOS UTILITÁRIOS
+   =================================== */
+.hidden {
+  display: none !important;
+}
+
+/* ===================================
+   MEDIA QUERIES - RESPONSIVIDADE ADICIONAL
+   Ajustes para telas muito pequenas ou grandes
+   =================================== */
 @media (max-width: 320px) {
   body {
-    width: 100%;
+    min-width: 280px !important;
+    max-width: 320px !important;
+  }
+  
+  .container {
+    padding: 12px;
   }
   
   .clock-container {
     max-width: 240px;
   }
   
+  .time-display {
+    font-size: 42px;
+  }
+  
   .control-btn {
     padding: 8px 16px;
     font-size: 12px;
+    min-width: 75px;
+  }
+  
+  .mode-tab {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+}
+
+@media (max-height: 480px) {
+  .container {
+    padding: 10px;
+    gap: 6px;
+  }
+  
+  .clock-container {
+    max-width: 220px;
+  }
+  
+  .time-display {
+    font-size: 40px;
+  }
+  
+  .mode-tabs {
+    margin-bottom: 6px;
+  }
+}
+
+@media (min-width: 400px) {
+  /* Caso o popup seja aberto em tela maior, mantém layout */
+  body {
+    max-width: 320px !important;
   }
 }
