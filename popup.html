@@ -15,7 +15,6 @@
       <button class="mode-tab" data-mode="stopwatch" role="tab" aria-selected="false" aria-controls="stopwatch-panel">CRONÔMETRO</button>
       <button class="mode-tab" data-mode="countdown" role="tab" aria-selected="false" aria-controls="countdown-panel">TIMER</button>
     </nav>
-
     <!-- Relógio Vintage -->
     <div class="clock-container" role="img" aria-label="Display do relógio">
       <svg class="clock-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
@@ -33,30 +32,24 @@
               <feMergeNode in="SourceGraphic"/>
             </feMerge>
           </filter>
-
           <!-- Gradiente radial para o fundo do relógio -->
           <radialGradient id="clockFace" cx="50%" cy="50%" r="50%">
             <stop offset="0%" style="stop-color:#f5f1e8;stop-opacity:1" />
             <stop offset="70%" style="stop-color:#e8dfc5;stop-opacity:1" />
             <stop offset="100%" style="stop-color:#d4c5a0;stop-opacity:1" />
           </radialGradient>
-
           <!-- Gradiente para efeito de profundidade -->
           <radialGradient id="depth" cx="50%" cy="50%" r="50%">
             <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.3" />
             <stop offset="100%" style="stop-color:#000000;stop-opacity:0.2" />
           </radialGradient>
         </defs>
-
         <!-- Círculo externo (moldura) -->
         <circle class="clock-border" cx="200" cy="200" r="190" filter="url(#shadow)"/>
-
         <!-- Face do relógio -->
         <circle class="clock-face" cx="200" cy="200" r="180" fill="url(#clockFace)"/>
-
         <!-- Efeito de profundidade -->
         <circle cx="200" cy="200" r="180" fill="url(#depth)" opacity="0.4"/>
-
         <!-- Marcadores de horas -->
         <g id="hour-markers" stroke="#8b4513" stroke-width="3">
           <!-- 12 marcadores principais -->
@@ -75,22 +68,27 @@
           <line x1="54" y1="114" x2="69" y2="124"/>
           <line x1="114" y1="54" x2="124" y2="69"/>
         </g>
-
+        
+        <!-- Ponteiros do relógio analógico -->
+        <line id="hourHand" x1="200" y1="200" x2="200" y2="120" stroke="#2c1810" stroke-width="8" stroke-linecap="round"/>
+        <line id="minuteHand" x1="200" y1="200" x2="200" y2="80" stroke="#3d2817" stroke-width="6" stroke-linecap="round"/>
+        <line id="secondHand" x1="200" y1="200" x2="200" y2="60" stroke="#d2691e" stroke-width="2" stroke-linecap="round"/>
+        
+        <!-- Centro do relógio -->
+        <circle cx="200" cy="200" r="8" fill="#2c1810"/>
+        
         <!-- Display de tempo digital -->
         <text class="time-display" x="200" y="200" id="time-text">00:00</text>
-
         <!-- Label da sessão -->
         <text class="session-label" x="200" y="260" id="session-text">Pronto</text>
       </svg>
     </div>
-
     <!-- Controles -->
     <div class="controls" role="group" aria-label="Controles do timer">
       <button class="control-btn" id="start-btn" aria-label="Iniciar timer">Iniciar</button>
       <button class="control-btn" id="pause-btn" aria-label="Pausar timer" style="display: none;">Pausar</button>
       <button class="control-btn" id="reset-btn" aria-label="Resetar timer">Resetar</button>
     </div>
-
     <!-- Configurações (ocultas por padrão) -->
     <div class="settings hidden" id="settings" role="region" aria-label="Configurações do timer">
       <div class="setting-group">
@@ -110,7 +108,6 @@
       </div>
     </div>
   </div>
-
   <!-- Script principal -->
   <script src="popup.js"></script>
 </body>
