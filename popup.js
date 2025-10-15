@@ -1,49 +1,42 @@
 // Elementos DOM
-const tabs = document.querySelectorAll('.tab');
-const analogClockContainer = document.getElementById('analogClockContainer');
-const stopwatchContainer = document.getElementById('stopwatchContainer');
-const countdownContainer = document.getElementById('countdownContainer');
-
-// Elementos do cronômetro
-const stopwatchDisplay = document.getElementById('stopwatchDisplay');
-const startStopwatch = document.getElementById('startStopwatch');
-const resetStopwatch = document.getElementById('resetStopwatch');
-
-// Elementos do timer
-const countdownDisplay = document.getElementById('countdownDisplay');
-const hoursInput = document.getElementById('hoursInput');
-const minutesInput = document.getElementById('minutesInput');
-const secondsInput = document.getElementById('secondsInput');
-const startCountdown = document.getElementById('startCountdown');
-const pauseCountdown = document.getElementById('pauseCountdown');
-const resetCountdown = document.getElementById('resetCountdown');
+const modeTabs = document.querySelectorAll('.mode-tab');
+const clockContainer = document.querySelector('.clock-container');
 
 // Elementos do relógio analógico
 const hourHand = document.getElementById('hourHand');
 const minuteHand = document.getElementById('minuteHand');
 const secondHand = document.getElementById('secondHand');
+const timeText = document.getElementById('time-text');
+const sessionText = document.getElementById('session-text');
+
+// Botões de controle
+const startBtn = document.getElementById('start-btn');
+const pauseBtn = document.getElementById('pause-btn');
+const resetBtn = document.getElementById('reset-btn');
 
 // Estado da aplicação
 let currentMode = 'clock';
 let clockInterval = null;
-let stopwatchInterval = null;
-let stopwatchTime = 0;
-let stopwatchRunning = false;
-let countdownInterval = null;
-let countdownTime = 0;
-let countdownRunning = false;
+let pomodoroState = 'ready'; // ready, work, break, longBreak
+let pomodoroTime = 0;
+let pomodoroRunning = false;
+let workDuration = 25 * 60; // 25 minutos em segundos
+let breakDuration = 5 * 60; // 5 minutos em segundos
+let longBreakDuration = 15 * 60; // 15 minutos em segundos
+let pomodoroCount = 0;
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', () => {
   setupTabListeners();
-  setupStopwatchListeners();
-  setupCountdownListeners();
+  setupControlListeners();
   initMode();
 });
 
 // Configurar listeners das abas
 function setupTabListeners() {
-  tabs.forEach(tab => {
+  if (!modeTabs) return;
+  
+  modeTabs.forEach(tab => {
     tab.addEventListener('click', () => {
       const mode = tab.dataset.mode;
       switchMode(mode);
@@ -51,44 +44,19 @@ function setupTabListeners() {
   });
 }
 
-// Configurar listeners do cronômetro
-function setupStopwatchListeners() {
-  startStopwatch.addEventListener('click', () => {
-    if (stopwatchRunning) {
-      stopStopwatch();
-    } else {
-      startStopwatchTimer();
-    }
-  });
+// Configurar listeners dos controles
+function setupControlListeners() {
+  if (startBtn) {
+    startBtn.addEventListener('click', handleStart);
+  }
   
-  resetStopwatch.addEventListener('click', () => {
-    resetStopwatchTimer();
-  });
-}
-
-// Configurar listeners do timer
-function setupCountdownListeners() {
-  startCountdown.addEventListener('click', () => {
-    if (!countdownRunning) {
-      const hours = parseInt(hoursInput.value) || 0;
-      const minutes = parseInt(minutesInput.value) || 0;
-      const seconds = parseInt(secondsInput.value) || 0;
-      countdownTime = hours * 3600 + minutes * 60 + seconds;
-      if (countdownTime > 0) {
-        startCountdownTimer();
-      }
-    }
-  });
+  if (pauseBtn) {
+    pauseBtn.addEventListener('click', handlePause);
+  }
   
-  pauseCountdown.addEventListener('click', () => {
-    if (countdownRunning) {
-      pauseCountdownTimer();
-    }
-  });
-  
-  resetCountdown.addEventListener('click', () => {
-    resetCountdownTimer();
-  });
+  if (resetBtn) {
+    resetBtn.addEventListener('click', handleReset);
+  }
 }
 
 // Trocar modo
@@ -96,27 +64,29 @@ function switchMode(mode) {
   currentMode = mode;
   
   // Atualizar abas ativas
-  tabs.forEach(tab => {
+  modeTabs.forEach(tab => {
     if (tab.dataset.mode === mode) {
       tab.classList.add('active');
+      tab.setAttribute('aria-selected', 'true');
     } else {
       tab.classList.remove('active');
+      tab.setAttribute('aria-selected', 'false');
     }
   });
   
   // Parar todos os timers
   stopClock();
-  stopStopwatch();
-  pauseCountdownTimer();
-  
-  // Mostrar conteúdo correto
-  analogClockContainer.style.display = mode === 'clock' ? 'flex' : 'none';
-  stopwatchContainer.style.display = mode === 'stopwatch' ? 'block' : 'none';
-  countdownContainer.style.display = mode === 'countdown' ? 'block' : 'none';
   
   // Inicializar modo
   if (mode === 'clock') {
     startClock();
+    if (sessionText) sessionText.textContent = 'Pronto';
+    if (timeText) timeText.style.display = 'none';
+  } else if (mode === 'countdown') {
+    pomodoroState = 'ready';
+    pomodoroTime = workDuration;
+    updatePomodoroDisplay();
+    if (timeText) timeText.style.display = 'block';
   }
 }
 
@@ -126,10 +96,9 @@ function initMode() {
 }
 
 // ========== RELÓGIO ANALÓGICO ==========
-
 function startClock() {
-  updateClock();
-  clockInterval = setInterval(updateClock, 1000);
+  updateAnalogClock();
+  clockInterval = setInterval(updateAnalogClock, 1000);
 }
 
 function stopClock() {
@@ -139,13 +108,14 @@ function stopClock() {
   }
 }
 
-function updateClock() {
+function updateAnalogClock() {
   const now = new Date();
   const hours = now.getHours();
   const minutes = now.getMinutes();
   const seconds = now.getSeconds();
   
   // Calcular ângulos (0 graus = 12h, sentido horário)
+  // Subtraindo 90 graus para começar do topo (12h)
   const secondAngle = (seconds * 6) - 90; // 6 graus por segundo
   const minuteAngle = (minutes * 6 + seconds * 0.1) - 90; // 6 graus por minuto + movimento suave
   const hourAngle = ((hours % 12) * 30 + minutes * 0.5) - 90; // 30 graus por hora + movimento suave
@@ -162,11 +132,11 @@ function updateClock() {
   const minuteX = cx + 120 * Math.cos(minuteAngle * Math.PI / 180);
   const minuteY = cy + 120 * Math.sin(minuteAngle * Math.PI / 180);
   
-  // Ponteiro dos segundos (comprimento: 130 pixels)
-  const secondX = cx + 130 * Math.cos(secondAngle * Math.PI / 180);
-  const secondY = cy + 130 * Math.sin(secondAngle * Math.PI / 180);
+  // Ponteiro dos segundos (comprimento: 140 pixels)
+  const secondX = cx + 140 * Math.cos(secondAngle * Math.PI / 180);
+  const secondY = cy + 140 * Math.sin(secondAngle * Math.PI / 180);
   
-  // Aplicar transformações
+  // Aplicar transformações aos ponteiros
   if (hourHand) {
     hourHand.setAttribute('x2', hourX);
     hourHand.setAttribute('y2', hourY);
@@ -183,100 +153,122 @@ function updateClock() {
   }
 }
 
-// ========== CRONÔMETRO ==========
-
-function startStopwatchTimer() {
-  stopwatchRunning = true;
-  startStopwatch.textContent = 'Pausar';
-  stopwatchInterval = setInterval(() => {
-    stopwatchTime++;
-    updateStopwatchDisplay();
-  }, 10);
-}
-
-function stopStopwatch() {
-  stopwatchRunning = false;
-  startStopwatch.textContent = 'Iniciar';
-  if (stopwatchInterval) {
-    clearInterval(stopwatchInterval);
-    stopwatchInterval = null;
+// ========== CONTROLES DO POMODORO ==========
+function handleStart() {
+  if (currentMode === 'countdown') {
+    if (!pomodoroRunning) {
+      pomodoroRunning = true;
+      if (pomodoroState === 'ready') {
+        pomodoroState = 'work';
+        pomodoroTime = workDuration;
+      }
+      startPomodoro();
+      startBtn.style.display = 'none';
+      pauseBtn.style.display = 'inline-block';
+    }
   }
 }
 
-function resetStopwatchTimer() {
-  stopStopwatch();
-  stopwatchTime = 0;
-  updateStopwatchDisplay();
+function handlePause() {
+  if (currentMode === 'countdown' && pomodoroRunning) {
+    pomodoroRunning = false;
+    stopClock();
+    pauseBtn.style.display = 'none';
+    startBtn.style.display = 'inline-block';
+  }
 }
 
-function updateStopwatchDisplay() {
-  const centiseconds = stopwatchTime % 100;
-  const totalSeconds = Math.floor(stopwatchTime / 100);
-  const seconds = totalSeconds % 60;
-  const minutes = Math.floor(totalSeconds / 60) % 60;
-  const hours = Math.floor(totalSeconds / 3600);
-  
-  stopwatchDisplay.textContent = 
-    `${pad(hours)}:${pad(minutes)}:${pad(seconds)}.${pad(centiseconds)}`;
+function handleReset() {
+  if (currentMode === 'countdown') {
+    pomodoroRunning = false;
+    pomodoroState = 'ready';
+    pomodoroTime = workDuration;
+    pomodoroCount = 0;
+    stopClock();
+    updatePomodoroDisplay();
+    startBtn.style.display = 'inline-block';
+    pauseBtn.style.display = 'none';
+    if (sessionText) sessionText.textContent = 'Pronto';
+  }
 }
 
-// ========== TIMER DE CONTAGEM REGRESSIVA ==========
-
-function startCountdownTimer() {
-  countdownRunning = true;
-  startCountdown.disabled = true;
-  pauseCountdown.disabled = false;
-  countdownInterval = setInterval(() => {
-    if (countdownTime > 0) {
-      countdownTime--;
-      updateCountdownDisplay();
-    } else {
-      // Timer finalizado
-      resetCountdownTimer();
-      playAlarm();
+function startPomodoro() {
+  stopClock();
+  clockInterval = setInterval(() => {
+    if (pomodoroRunning && pomodoroTime > 0) {
+      pomodoroTime--;
+      updatePomodoroDisplay();
+    } else if (pomodoroTime === 0) {
+      handlePomodoroComplete();
     }
   }, 1000);
 }
 
-function pauseCountdownTimer() {
-  countdownRunning = false;
-  startCountdown.disabled = false;
-  pauseCountdown.disabled = true;
-  if (countdownInterval) {
-    clearInterval(countdownInterval);
-    countdownInterval = null;
+function handlePomodoroComplete() {
+  pomodoroRunning = false;
+  
+  if (pomodoroState === 'work') {
+    pomodoroCount++;
+    if (pomodoroCount % 4 === 0) {
+      pomodoroState = 'longBreak';
+      pomodoroTime = longBreakDuration;
+      if (sessionText) sessionText.textContent = 'Intervalo Longo';
+    } else {
+      pomodoroState = 'break';
+      pomodoroTime = breakDuration;
+      if (sessionText) sessionText.textContent = 'Intervalo';
+    }
+  } else {
+    pomodoroState = 'work';
+    pomodoroTime = workDuration;
+    if (sessionText) sessionText.textContent = 'Foco';
+  }
+  
+  updatePomodoroDisplay();
+  playNotification();
+  
+  // Auto-start next session after 3 seconds
+  setTimeout(() => {
+    if (!pomodoroRunning) {
+      handleStart();
+    }
+  }, 3000);
+}
+
+function updatePomodoroDisplay() {
+  if (!timeText) return;
+  
+  const minutes = Math.floor(pomodoroTime / 60);
+  const seconds = pomodoroTime % 60;
+  
+  timeText.textContent = `${pad(minutes)}:${pad(seconds)}`;
+  
+  // Atualizar label da sessão
+  if (sessionText) {
+    if (pomodoroState === 'ready') {
+      sessionText.textContent = 'Pronto';
+    } else if (pomodoroState === 'work') {
+      sessionText.textContent = 'Foco';
+    } else if (pomodoroState === 'break') {
+      sessionText.textContent = 'Intervalo';
+    } else if (pomodoroState === 'longBreak') {
+      sessionText.textContent = 'Intervalo Longo';
+    }
   }
 }
 
-function resetCountdownTimer() {
-  pauseCountdownTimer();
-  countdownTime = 0;
-  hoursInput.value = '';
-  minutesInput.value = '';
-  secondsInput.value = '';
-  updateCountdownDisplay();
-}
-
-function updateCountdownDisplay() {
-  const hours = Math.floor(countdownTime / 3600);
-  const minutes = Math.floor((countdownTime % 3600) / 60);
-  const seconds = countdownTime % 60;
-  
-  countdownDisplay.textContent = `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
-}
-
-function playAlarm() {
-  // Notificação sonora simples usando a API de notificações do navegador
-  if (Notification.permission === 'granted') {
-    new Notification('Timer Finalizado!', {
-      body: 'O tempo acabou!',
+function playNotification() {
+  // Notificação usando a API de notificações do navegador
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification('Timer Pomodoro', {
+      body: pomodoroState === 'work' ? 'Tempo de intervalo!' : 'Hora de focar!',
       icon: 'icon.png'
     });
-  } else if (Notification.permission !== 'denied') {
+  } else if ('Notification' in window && Notification.permission !== 'denied') {
     Notification.requestPermission().then(permission => {
       if (permission === 'granted') {
-        new Notification('Timer Finalizado!', {
-          body: 'O tempo acabou!',
+        new Notification('Timer Pomodoro', {
+          body: pomodoroState === 'work' ? 'Tempo de intervalo!' : 'Hora de focar!',
           icon: 'icon.png'
         });
       }
@@ -285,7 +277,6 @@ function playAlarm() {
 }
 
 // ========== FUNÇÕES AUXILIARES ==========
-
 function pad(num) {
   return num.toString().padStart(2, '0');
 }
